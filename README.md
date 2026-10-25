@@ -1,5 +1,7 @@
 # vastlint-action
 
+Created by [Aleksander Sekowski](https://github.com/aleksUIX).
+
 GitHub Action to validate VAST XML in CI using the `vastlint` CLI.
 
 ## Usage

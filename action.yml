@@ -1,4 +1,5 @@
 name: vastlint VAST Validator
+author: Aleksander Sekowski
 description: Validate VAST XML files in CI using vastlint
 branding:
   icon: check-circle
