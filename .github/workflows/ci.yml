@@ -1,0 +1,47 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Composite action on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Valid fixture passes
+        uses: ./
+        with:
+          path: test/fixtures/valid.xml
+          version: v0.15.3
+      - name: Invalid fixture fails
+        id: invalid
+        continue-on-error: true
+        uses: ./
+        with:
+          path: test/fixtures/invalid.xml
+          version: v0.15.3
+      - name: Verify invalid result and create literal shell-like filename
+        shell: bash
+        env:
+          INVALID_OUTCOME: ${{ steps.invalid.outcome }}
+        run: |
+          test "$INVALID_OUTCOME" = failure
+          # shellcheck disable=SC2016
+          cp test/fixtures/valid.xml 'test/fixtures/$(touch injected).xml'
+      - name: Input filenames remain literal data
+        uses: ./
+        with:
+          path: 'test/fixtures/$(touch injected).xml'
+          version: v0.15.3
+      - name: Verify command substitution did not run
+        shell: bash
+        run: test ! -e injected
